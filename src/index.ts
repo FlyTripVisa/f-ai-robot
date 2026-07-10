@@ -9,14 +9,24 @@ export default {
     }
 
     if (url.pathname === '/api/chat') {
-      const { msg } = await request.json();
-      const stream = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
-        messages: [{ role: 'user', content: msg }],
-        stream: true
-      });
-      return new Response(stream as any, { headers: { 'content-type': 'text/event-stream' } });
-    }
+  try {
+    const { msg } = await request.json();
+    
+    // AI রান করা হচ্ছে
+    const stream = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+      messages: [{ role: 'user', content: msg }],
+      stream: true
+    });
 
-    return new Response('Not Found', { status: 404 });
+    // এখানে Response-কে একদম পরিষ্কারভাবে ট্রিমিং করে পাঠানো হচ্ছে
+    return new Response(stream as ReadableStream, {
+      headers: {
+        'content-type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: "AI Failed" }), { status: 500 });
   }
-};
+}
