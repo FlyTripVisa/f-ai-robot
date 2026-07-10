@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>FlyTripChat</title>
+    <style>
+        body { background: #161616; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .logo { width: 100px; height: 100px; background: #333; border-radius: 50%; margin-bottom: 20px; }
+        .box { width: 90%; max-width: 600px; background: #2a2a2a; border-radius: 20px; padding: 20px; }
+        #input { width: 100%; border: none; background: none; color: white; outline: none; font-size: 16px; margin-bottom: 10px; }
+        .footer { display: flex; justify-content: space-between; border-top: 1px solid #444; padding-top: 10px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 90%; max-width: 600px; margin-top: 20px; }
+        .btn { background: #2a2a2a; padding: 15px; border-radius: 12px; cursor: pointer; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="logo"></div>
+    <div class="box">
+        <input type="text" id="input" placeholder="Ask anything privately...">
+        <div class="footer">
+            <span>📎 ⚙️ ⚡ 5.4-nano ▾</span>
+            <button onclick="send()">Ask</button>
+        </div>
+    </div>
+    <div class="grid">
+        <div class="btn">Chat Suggestions</div><div class="btn">Create & Edit Images</div>
+        <div class="btn">Voice Chat</div><div class="btn">How it Works</div>
+    </div>
+    <script>
+        async function send() {
+            const msg = document.getElementById('input').value;
+            const res = await fetch('/api/chat', { method: 'POST', body: JSON.stringify({ msg }) });
+            const reader = res.body.getReader();
+            while(true) { const {done, value} = await reader.read(); if(done) break; console.log(new TextDecoder().decode(value)); }
+        }
+    </script>
+</body>
+</html>
